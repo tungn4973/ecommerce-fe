@@ -96,6 +96,9 @@ const AddProductDetail = ({ categories }) => {
           error: false,
         });
         e.target.reset();
+        setTimeout(() => {
+          dispatch({ type: "addProductModal", payload: false });
+        }, 1000);
       } else if (responseData.error) {
         setFdata({ ...fData, success: false, error: responseData.error });
         setTimeout(() => {
@@ -230,7 +233,34 @@ const AddProductDetail = ({ categories }) => {
                 id="image"
                 multiple
               />
-              {uploading && <span className="text-blue-500 text-sm">Uploading images...</span>}
+              {/* Preview selected images */}
+              {fData.pImageFiles && fData.pImageFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {fData.pImageFiles.map((file, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        className="h-16 w-16 object-cover rounded"
+                        src={URL.createObjectURL(file)}
+                        alt={`preview-${index}`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newFiles = fData.pImageFiles.filter((_, i) => i !== index);
+                          setFdata({
+                            ...fData,
+                            pImageFiles: newFiles.length > 0 ? newFiles : null,
+                          });
+                        }}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {uploading && <span className="text-blue-500 text-sm mt-2">Uploading images...</span>}
             </div>
             {/* Most Important part for uploading multiple image */}
             <div className="flex space-x-1 py-4">

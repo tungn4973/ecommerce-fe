@@ -76,11 +76,8 @@ const EditProductModal = (props) => {
         fetchData();
         setEditformdata({ ...editformData, success: responseData.success });
         setTimeout(() => {
-          return setEditformdata({
-            ...editformData,
-            success: responseData.success,
-          });
-        }, 2000);
+          dispatch({ type: "editProductModalClose", payload: false });
+        }, 1000);
       } else if (responseData.error) {
         setEditformdata({ ...editformData, error: responseData.error });
         setTimeout(() => {
@@ -114,18 +111,19 @@ const EditProductModal = (props) => {
           data.editProductModal.modal ? "" : "hidden"
         } fixed inset-0 flex items-center z-30 justify-center overflow-auto`}
       >
-        <div className="mt-32 md:mt-0 relative bg-white w-11/12 md:w-3/6 shadow-lg flex flex-col items-center space-y-4 px-4 py-4 md:px-8">
-          <div className="flex items-center justify-between w-full pt-4">
+        <div className="mt-32 md:mt-0 relative bg-white w-11/12 md:w-3/6 shadow-lg flex flex-col items-center space-y-4 px-4 py-4 md:px-8 max-h-screen overflow-y-auto">
+          <div className="flex items-center justify-between w-full pt-4 sticky top-0 bg-white z-10">
             <span className="text-left font-semibold text-2xl tracking-wider">
               Edit Product
             </span>
             {/* Close Modal */}
-            <span
+            <button
+              type="button"
               style={{ background: "#303031" }}
-              onClick={(e) =>
+              onClick={() =>
                 dispatch({ type: "editProductModalClose", payload: false })
               }
-              className="cursor-pointer text-gray-100 py-2 px-2 rounded-full"
+              className="cursor-pointer text-gray-100 py-2 px-2 rounded-full hover:bg-gray-700"
             >
               <svg
                 className="w-6 h-6"
@@ -141,7 +139,7 @@ const EditProductModal = (props) => {
                   d="M6 18L18 6M6 6l12 12"
                 />
               </svg>
-            </span>
+            </button>
           </div>
           {editformData.error ? alert(editformData.error, "red") : ""}
           {editformData.success ? alert(editformData.success, "green") : ""}
@@ -203,23 +201,35 @@ const EditProductModal = (props) => {
             {/* Most Important part for uploading multiple image */}
             <div className="flex flex-col mt-4">
               <label htmlFor="image">Product Images *</label>
-              {editformData.pImages ? (
-                <div className="flex space-x-1">
-                  <img
-                    className="h-16 w-16 object-cover"
-                    src={`${apiURL}/uploads/products/${editformData.pImages[0]}`}
-                    alt="productImage"
-                  />
-                  <img
-                    className="h-16 w-16 object-cover"
-                    src={`${apiURL}/uploads/products/${editformData.pImages[1]}`}
-                    alt="productImage"
-                  />
+              {editformData.pImages && editformData.pImages.length > 0 ? (
+                <div className="flex flex-wrap gap-2 my-2">
+                  {editformData.pImages.map((img, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        className="h-16 w-16 object-cover rounded"
+                        src={img}
+                        alt={`productImage-${index}`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newImages = editformData.pImages.filter((_, i) => i !== index);
+                          setEditformdata({
+                            ...editformData,
+                            pImages: newImages,
+                          });
+                        }}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
                 </div>
               ) : (
-                ""
+                <p className="text-gray-500 text-sm my-2">No images</p>
               )}
-              <span className="text-gray-600 text-xs">Must need 2 images</span>
+              <span className="text-gray-600 text-xs">Upload 1-10 images</span>
               <input
                 onChange={(e) =>
                   setEditformdata({
