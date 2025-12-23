@@ -1,7 +1,6 @@
 import React, { Fragment, useEffect, useContext, useState } from "react";
 import OrderSuccessMessage from "./OrderSuccessMessage";
 import { HomeContext } from "./";
-import { sliderImages } from "../../admin/dashboardAdmin/Action";
 import { prevSlide, nextSlide } from "./Mixins";
 
 const apiURL = process.env.REACT_APP_API_URL;
@@ -11,7 +10,15 @@ const Slider = (props) => {
   const [slide, setSlide] = useState(0);
 
   useEffect(() => {
-    sliderImages(dispatch);
+    // If there are no slider images in context (admin removed), seed with local defaults
+    if (!data.sliderImages || data.sliderImages.length === 0) {
+      const defaults = [
+        { slideImage: "abc.jpg" },
+        { slideImage: "a3.jpg" },
+        { slideImage: "a2.png" },
+      ];
+      dispatch({ type: "sliderImages", payload: defaults });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -20,10 +27,13 @@ const Slider = (props) => {
       <div className="relative mt-16 bg-gray-100 border-2">
         
         {data.sliderImages.length > 0 ? (
-          
           <img
             className="w-full"
-            src={`${apiURL}/uploads/customize/${data.sliderImages[slide].slideImage}`}
+            src={
+              data.sliderImages[slide].slideImage.startsWith("http")
+                ? data.sliderImages[slide].slideImage
+                : `${process.env.PUBLIC_URL}/img/list/${data.sliderImages[slide].slideImage}`
+            }
             alt="sliderImage"
           />
         ) : (

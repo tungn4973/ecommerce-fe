@@ -1,20 +1,29 @@
 import React, { Fragment, useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import Layout from "../layout";
 import { getAllProduct } from "../../admin/products/FetchApi";
-import { getAllCategory } from "../../admin/categories/FetchApi";
 import { isWishReq, unWishReq, isWish } from "../home/Mixins";
 
 const ShopComponent = () => {
   const history = useHistory();
+  const location = useLocation();
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [sortBy, setSortBy] = useState("");
   const [wList, setWlist] = useState(
     JSON.parse(localStorage.getItem("wishList"))
   );
+
+  // Get filter from URL
+  const getFilterFromURL = () => {
+    const params = new URLSearchParams(location.search);
+    const filter = params.get("filter");
+    if (filter === "kynang") return "Kỹ năng";
+    if (filter === "chungchi") return "Chứng chỉ";
+    if (filter === "hopdong") return "Hợp đồng";
+    return "";
+  };
+
+  const selectedFilter = getFilterFromURL();
 
   useEffect(() => {
     fetchData();
@@ -23,15 +32,9 @@ const ShopComponent = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [productRes, categoryRes] = await Promise.all([
-        getAllProduct(),
-        getAllCategory(),
-      ]);
+      const productRes = await getAllProduct();
       if (productRes && productRes.Products) {
         setProducts(productRes.Products);
-      }
-      if (categoryRes && categoryRes.Categories) {
-        setCategories(categoryRes.Categories);
       }
     } catch (error) {
       console.log(error);
@@ -39,24 +42,15 @@ const ShopComponent = () => {
     setLoading(false);
   };
 
-  // Filter và sort products
+  // Filter products
   const getFilteredProducts = () => {
     let filtered = [...products];
 
-    // Filter by category
-    if (selectedCategory) {
+    // Filter by selected filter (kỹ năng, chứng chỉ, hợp đồng)
+    if (selectedFilter) {
       filtered = filtered.filter(
-        (p) => p.pCategory && p.pCategory._id === selectedCategory
+        (p) => p.pCategory && p.pCategory.cName === selectedFilter
       );
-    }
-
-    // Sort
-    if (sortBy === "price-low") {
-      filtered.sort((a, b) => a.pPrice - b.pPrice);
-    } else if (sortBy === "price-high") {
-      filtered.sort((a, b) => b.pPrice - a.pPrice);
-    } else if (sortBy === "newest") {
-      filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
 
     return filtered;
@@ -87,41 +81,6 @@ const ShopComponent = () => {
   return (
     <Fragment>
       <div className="container mx-auto px-4 py-6 pt-20">
-        <h1 className="text-2xl font-semibold mb-6 pt-20">Tất cả sản phẩm</h1>
-
-        {/* Filter & Sort */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-          <div className="flex items-center space-x-4">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="border px-4 py-2 rounded focus:outline-none"
-            >
-              <option value="">Tất cả danh mục</option>
-              {categories.map((cat) => (
-                <option key={cat._id} value={cat._id}>
-                  {cat.cName}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex items-center space-x-4">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="border px-4 py-2 rounded focus:outline-none"
-            >
-              <option value="">Sắp xếp</option>
-              <option value="newest">Mới nhất</option>
-              <option value="price-low">Giá thấp đến cao</option>
-              <option value="price-high">Giá cao đến thấp</option>
-            </select>
-            <span className="text-gray-600 text-sm">
-              {filteredProducts.length} sản phẩm
-            </span>
-          </div>
-        </div>
-
         {/* Products Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredProducts.length > 0 ? (

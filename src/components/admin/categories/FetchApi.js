@@ -1,82 +1,15 @@
-import axios from "axios";
 const apiURL = process.env.REACT_APP_API_URL;
-
-const BearerToken = () =>
-  localStorage.getItem("jwt")
-    ? JSON.parse(localStorage.getItem("jwt")).token
-    : false;
-const Headers = () => {
-  return {
-    headers: {
-      token: `Bearer ${BearerToken()}`,
-    },
-  };
-};
-
-// Upload ảnh lên Cloudinary
-export const uploadImage = async (file, folder = "categories") => {
-  let formData = new FormData();
-  formData.append("image", file);
-  formData.append("folder", folder);
-
-  try {
-    let res = await axios.post(`${apiURL}/api/upload/single`, formData);
-    return res.data;
-  } catch (error) {
-    console.log(error);
-    return { error: "Upload failed" };
-  }
-};
 
 export const getAllCategory = async () => {
   try {
-    let res = await axios.get(`${apiURL}/api/category/all-category`, Headers());
-    return res.data;
+    if (!apiURL) return { Categories: [] };
+    const res = await fetch(`${apiURL}/categories`);
+    const data = await res.json();
+    return data;
   } catch (error) {
-    console.log(error);
+    console.warn("getAllCategory fetch failed:", error);
+    return { Categories: [] };
   }
 };
 
-export const createCategory = async ({
-  cName,
-  cImage,
-  cDescription,
-  cStatus,
-}) => {
-  try {
-    let res = await axios.post(
-      `${apiURL}/api/category/add-category`,
-      { cName, cImage, cDescription, cStatus },
-      Headers()
-    );
-    return res.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-export const editCategory = async ({ cId, cName, cDescription, cStatus, cImage, cImageOldPublicId }) => {
-  try {
-    let res = await axios.post(
-      `${apiURL}/api/category/edit-category`,
-      { cId, cName, cDescription, cStatus, cImage, cImageOldPublicId },
-      Headers()
-    );
-    return res.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-export const deleteCategory = async (cId) => {
-  try {
-    let res = await axios.post(
-      `${apiURL}/api/category/delete-category`,
-      { cId },
-      Headers()
-    );
-    return res.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
+export default { getAllCategory };

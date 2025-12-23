@@ -134,11 +134,7 @@ const SingleProduct = (props) => {
             </Fragment>
           );
         })
-      ) : (
-        <div className="col-span-2 md:col-span-3 lg:col-span-4 flex items-center justify-center py-24 text-2xl">
-          No product found
-        </div>
-      )}
+      ) : null}
     </Fragment>
   );
 };

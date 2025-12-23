@@ -159,9 +159,7 @@ const CheckoutProducts = ({ products }) => {
               </div>
             );
           })
-        ) : (
-          <div>No product found for checkout</div>
-        )}
+        ) : null}
       </div>
     </Fragment>
   );

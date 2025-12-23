@@ -1,10 +1,9 @@
 import React, { Fragment, createContext, useReducer } from "react";
 import Layout from "../layout";
 import Slider from "./Slider";
-import ProductCategory from "./ProductCategory";
 import { homeState, homeReducer } from "./HomeContext";
 import SingleProduct from "./SingleProduct";
-import NewsSection from "./NewsSection";
+// NewsSection removed from home per request
 
 export const HomeContext = createContext();
 
@@ -13,17 +12,13 @@ const HomeComponent = () => {
     <Fragment>
       <Slider />
       <div className="container mx-auto px-4">
-        {/* Category, Search & Filter Section */}
-        <section className="my-6 pt-10">
-          <ProductCategory />
-        </section>
+        {/* Categories/Filter/Search removed */}
         {/* Product Section */}
         <section className="my-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           <SingleProduct />
         </section>
       </div>
-      {/* News Section */}
-      <NewsSection />
+      {/* News section removed */}
     </Fragment>
   );
 };
