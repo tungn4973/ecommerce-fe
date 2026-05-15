@@ -106,14 +106,23 @@ export const CheckoutComponent = (props) => {
                     placeholder="+84"
                   />
                 </div>
-                <div
-                  onClick={(e) =>
-                    pay(data, dispatch, state, setState, totalCost, history)
-                  }
-                  className="w-full px-4 py-2 text-center text-white font-semibold cursor-pointer"
-                  style={{ background: "#303031" }}
-                >
-                  Đặt hàng
+                <div className="flex flex-col gap-2 mt-4">
+                  <button
+                    onClick={() =>
+                      pay(data, dispatch, state, setState, totalCost, history, "COD")
+                    }
+                    className="w-full px-4 py-2 text-center text-white font-semibold cursor-pointer bg-gray-800 hover:bg-gray-900 rounded"
+                  >
+                    Đặt hàng (Thanh toán khi nhận hàng)
+                  </button>
+                  <button
+                    onClick={() =>
+                      pay(data, dispatch, state, setState, totalCost, history, "VNPay")
+                    }
+                    className="w-full px-4 py-2 text-center text-white font-semibold cursor-pointer bg-blue-600 hover:bg-blue-700 rounded"
+                  >
+                    Thanh toán VNPay (QR/ATM)
+                  </button>
                 </div>
               </div>
             </Fragment>

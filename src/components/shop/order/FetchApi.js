@@ -13,9 +13,20 @@ export const getBrainTreeToken = async () => {
   }
 };
 
+
 export const createOrder = async (orderData) => {
   try {
     let res = await axios.post(`${apiURL}/api/order/create-order`, orderData);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// Gọi API tạo QR VNPay
+export const createVNPayQR = async (payload) => {
+  try {
+    let res = await axios.post(`${apiURL}/api/pay/create-vnpay-qr`, payload);
     return res.data;
   } catch (error) {
     console.log(error);
